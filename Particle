@@ -1,0 +1,46 @@
+// This #include statement was automatically added by the Particle IDE.
+#include <JsonParserGeneratorRK.h>
+
+// This #include statement was automatically added by the Particle IDE.
+#include <Grove_Temperature_And_Humidity_Sensor.h>
+
+// Define the delay time for publishing data (30 seconds) and the pin for the DHT sensor (D3)
+#define DELAY_TIME 3000//30 sec
+#define DHT_PIN D3
+
+// Create a DHT object to read temperature and humidity data from the sensor
+DHT dht (DHT_PIN);
+// Declare a variable to store the temperature value
+double temp;
+
+// Define a function to publish the temperature data to Particle cloud
+void postEventPayload(double temp)
+{
+    // Create a JSON object to store the temperature value
+    JsonWriterStatic<256>jw;
+    {
+        
+    // Create an auto object to write the key-value pair for the temperature value to the JSON object
+    JsonWriterAutoObject obj(&jw);
+    jw.insertKeyValue("temp",temp);
+        
+    }
+        // Publish the JSON object as an event to Particle cloud with the event name "temp" and the data "20"
+    // Note that the data value "20" is hard-coded and should be replaced with the actual temperature value
+    Particle.publish("temp","20",PRIVATE);
+}
+
+void setup(){
+    // Initialize the DHT sensor
+    dht.begin();
+    // Set the DHT pin as an input
+    pinMode(DHT_PIN, INPUT);
+}
+void loop() {
+    // Read the temperature value from the DHT sensor
+    temp = dht.getTempCelcius();
+     // Publish the temperature value to Particle cloud using the postEventPayload() function.
+    postEventPayload(temp);
+    // Wait for the specified delay time before reading and publishing the temperature data again.
+    delay(DELAY_TIME);
+}
